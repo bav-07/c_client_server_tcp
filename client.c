@@ -33,27 +33,31 @@ int main(int argc, char const *argv[])
     addr.sin_port = port;
     addr.sin_addr.s_addr = inet_addr(ip);
 
-    while (1) {
-        // Connect to server
-        connect(sock, (struct sockaddr*)&addr, sizeof(addr));
-        printf("Connected to server.\n");
+    // Connect to server
+    connect(sock, (struct sockaddr*)&addr, sizeof(addr));
+    printf("Connected to server.\n");
 
+    for(;;) {
+        
         // Fill buffer with 0s
         bzero(buffer, 1024);
-        strcpy(buffer, "HELLO, THIS IS CLIENT.\n");
+        strcpy(buffer, "Sending request to server.\n");
         printf("Client: %s\n", buffer);
 
         // Send message to server
         send(sock, buffer, strlen(buffer), 0);
 
-        // Receive message from server
+        // Receive message from server (current time)
         bzero(buffer, 1024);
         recv(sock, buffer, sizeof(buffer), 0);
         printf("Server: %s", buffer);
 
-        close(sock);
-        printf("Disconnected from the server.\n");
-        sleep(3); 
+        // wait for 5 minutes
+        sleep(300); 
     }
+
+    close(sock);
+    printf("Disconnected from the server.\n");
+
     return 0;
 }

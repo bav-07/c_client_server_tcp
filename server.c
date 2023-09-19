@@ -43,41 +43,31 @@ int main(int argc, char const *argv[])
     printf("[+]Binded to port number: %d\n", port);
 
     // Listen for client
-    
+    listen(server_sock, 5);
+    printf("Listening...\n");
+    // accept connection from client
+    addr_size = sizeof(client_addr);
+    client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);
+    printf("[+] Client connected.\n");
 
-    while (1) {
-        listen(server_sock, 5);
-        printf("Listening...\n");
-        // accept connection from client
-        addr_size = sizeof(client_addr);
-        client_sock = accept(server_sock, (struct sockaddr*)&client_addr, &addr_size);
-        printf("[+] Client connected.\n");
-        pid = fork();
-        if (pid == -1) { 
-            perror("Error\n");
-            exit(1);
-        }
-        if (pid == 0) {
-            close(server_sock);
-            // receive message from client  
-            bzero(buffer, 1024);
-            recv(client_sock, buffer, sizeof(buffer), 0);
-            printf("Client: %s", buffer);
-
-            time_t t;
-            time(&t);
-
-            bzero(buffer, 1024);
-            strcpy(buffer, ctime(&t));
-            printf("Server: %s", buffer);
-            send(client_sock, buffer, sizeof(buffer), 0);
-            close(client_sock);
-            exit(0);
-        }
+    for (;;) {
         
-        close(client_sock); 
-        printf("[+]Client disconnected.\n\n");
-    }
+        // receive message from client  
+        bzero(buffer, 1024);
+        recv(client_sock, buffer, sizeof(buffer), 0);
+        printf("Client: %s", buffer);
 
+        time_t t;
+        time(&t);
+
+        bzero(buffer, 1024);
+        strcpy(buffer, ctime(&t));
+        printf("Server: %s", buffer);
+        send(client_sock, buffer, sizeof(buffer), 0);
+       
+    }
+    close(client_sock); 
+    printf("[+]Client disconnected.\n\n");
+    
     return 0;
 }
